@@ -1,0 +1,324 @@
+XQuery
+
+1. Realizar una tabla html con el título "Situación de los libros" y en la que se muestren las columnas: código
+de libro, título, año y situación (comprado o pendiente).
+let $a := doc('/db/examenBDXML/libros.xml')/libreria/libro
+
+return
+
+<html>
+
+    <head>
+   
+ </head>
+
+    <body>
+
+        <table border='1'>
+
+	<caption>Situacion de los libros</caption>
+            <tr>
+
+                <td>Codigo</td>
+
+                <td>Titulo</td>
+
+                <td>Año</td>
+
+                <td>Situacion</td>
+
+            </tr>
+
+            {for $b in $a
+
+            return
+
+            <tr>
+
+                <td>{$b/data(@codigo)}</td>
+
+                <td>{$b/titulo}</td>
+
+                <td>{$b/anyo}</td>
+
+                {for $c in doc('/db/examenBDXML/librosAlmacen.xml')/almacen
+
+                return if($b/data(@codigo) = $c/comprados/codigo)
+
+                            then(<td> comprado </td>)
+
+                            else(<td> pendiente </td>)
+
+                }
+
+            </tr>}
+
+        </table>
+
+    </body>
+
+</html>
+
+
+2. Realizar un lista ordenada html de nombre de autores.
+
+<html>
+
+    <head>
+   
+ </head>
+
+    <body>
+
+        <ol>
+
+            {
+
+            for $a in doc('/db/examenBDXML/libros.xml')/libreria/libro/autor
+
+            return
+
+            <li>{$a}</li>
+
+            }
+
+        </ol>
+
+    </body>
+
+</html>
+
+3. Realizar una tabla html con el título "Listado de libros de categorías" y que tenga las columnas: categoría y
+numero de títulos de esa categoria.
+
+let $a := distinct-values(doc('/db/examenBDXML/libros.xml')/libreria/libro/@categoria)
+
+return
+
+<html>
+
+    <head>
+   
+ </head>
+
+    <body>
+
+        <table border='1'>
+
+	<caption>Listado de libros de categorias</caption>
+            <tr>
+
+                <td>Categoria</td>
+
+                <td>Nº de titulos</td>
+
+            </tr>
+
+            {for $b in $a
+
+            return
+
+            <tr>
+
+                <td>{$b}</td>
+
+                {
+
+                let $c := doc('/db/examenBDXML/libros.xml')/libreria/libro[@categoria=$b]
+
+                return <td>{count($c)}</td>
+
+                }
+
+            </tr>}
+
+        </table>
+
+    </body>
+
+</html>
+
+
+4. Realizar una tabla html con el título "Listado de libros" y que tenga las columnas: código, categoría, título,
+autor, año y precio. En la columna autor deberán figurar el texto “varios" si hay más de un autor.
+
+let $a := doc('/db/examenBDXML/libros.xml')/libreria/libro
+return
+
+<html>
+
+    <head>
+   
+ </head>
+
+    <body>
+
+        <table border='1'>
+
+	<caption>Listado de libros</caption>
+            <tr>
+
+                <td>Codigo</td>
+
+                <td>Categoria</td>
+
+                <td>Titulo</td>
+
+                <td>Autor</td>
+
+                <td>Año</td>
+
+                <td>Precio</td>
+
+            </tr>
+
+            {for $b in $a
+
+            return
+
+            <tr>
+
+                <td>{$b/data(@codigo)}</td>
+
+                <td>{$b/data(@categoria)}</td>
+
+                <td>{$b/titulo/text()}</td>
+
+                <td>{if(count($b/autor)>1)
+
+                    then('Varios')
+
+                    else($b/autor/text())
+
+                }</td>
+
+                <td>{$b/anyo/text()}</td>
+
+                <td>{$b/precio/text()}</td>
+
+            </tr>}
+
+        </table>
+
+    </body>
+
+</html>
+
+
+5. Realizar una tabla html con el título "listado de libros pendientes anteriores a 2004" con las columnas:
+codigo, categoria, titulo y precio.
+
+let $a := doc('/db/examenBDXML/libros.xml')/libreria/libro
+return
+
+<html>
+
+    <head>
+   
+    </head>
+
+    <body>
+
+        <table border='1'>
+
+        <caption>Listado de libros pendientes anteriores a 2004</caption>
+
+            <tr>
+
+                <td>Codigo</td>
+
+                <td>Categoria</td>
+
+                <td>Titulo</td>
+
+                <td>Precio</td>
+
+            </tr>
+
+            {for $b in $a
+
+            return
+
+            if(($b/anyo < '2004'))
+
+                then(
+ 
+                    <libro>
+
+                    {
+
+                    for $c in doc('/db/examenBDXML/librosAlmacen.xml')/almacen
+
+                    return
+
+                    if($b/data(@codigo) = $c/pendientes/codigo)
+
+                        then(
+
+                                <tr>
+
+                                    <td>{$b/data(@codigo)}</td>
+
+                                    <td>{$b/data(@categoria)}</td>
+
+                                    <td>{$b/titulo/text()}</td>
+
+                                    <td>{$b/precio/text()}</td>
+
+                                </tr>
+
+                            )
+
+                        else()
+
+                    
+}
+   
+                    </libro>
+
+                )
+
+                else()
+
+            }
+
+        </table>
+
+    </body>
+
+</html>
+
+XPATH
+
+
+1. Nombre de los módulos del ciclo ASIR:
+/ies/modulos/modulo[ciclo='ASIR']/nombre
+
+2. Nombre de los módulos que se imparten en el segundo curso de cualquier ciclo:
+/ies/modulos/modulo[curso=2]/nombre
+
+3. Nombre de los módulos de menos de 5 horas semanales:
+/ies/modulos/modulo[horasSemanales<5]/nombre
+
+4. Nombre de los módulos que se imparten en el primer curso de ASIR:
+/ies/modulos/modulo[ciclo='ASIR'][curso=1]/nombre
+
+5. Horas semanales de los módulos de más de 3 horas semanales (4, 5, 5).
+/ies/modulos/modulo[horasSemanales>3]/horasSemanales
+
+6. Nombre de los módulos del ciclo "Sistemas Microinformáticos y Redes" (en la expresión final no
+deben aparecer las siglas SMR):
+/ies/modulos/modulo[ciclo=/ies/ciclos/ciclo[upper-case(nombre)='SISTEMAS MICROINFORMÁTICOS Y REDES']/data(@id)]/nombre
+
+7. Nombre de los ciclos que incluyen el módulo "Lenguajes de marcas y sistemas de gestión de información":
+/ies/ciclos/ciclo[@id=/ies/modulos/modulo[upper-case(nombre)='LENGUAJES DE MARCAS Y SISTEMAS DE GESTION DE INFORMACION']/ciclo]/nombre
+
+8. Nombre de los módulos de ciclos de Grado Superior:
+/ies/modulos/modulo[ciclo=/ies/ciclos/ciclo[grado='Superior']/data(@id)]/nombre
+
+9. Nombre de los módulos de ciclos cuyo título se aprobó en 2008:
+/ies/ciclos/ciclo[decretoTitulo='2008']/nombre
+
+10. Grado de los ciclos con módulos de primer curso:
+a. Superior
+b. Superior
